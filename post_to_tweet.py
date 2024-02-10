@@ -1,11 +1,6 @@
 import tweepy
 
-# Set up your credentials
-BEARER = "AAAAAAAAAAAAAAAAAAAAAKk2sQEAAAAAaPy%2FfEbPh1kGmGkQGpSseg24qSo%3DJMGXx68HjKTS3wkjdn8fe41qleQdy5rbxYrVike6B1M4gaeXv4"
-CONSUMER_KEY = "p4ePCXbUgiYqwHy1fWuEuhJZW"
-CONSUMER_SECRET = "jFxrHhXorAcvtkZ6Ijins6HLAi1vv9d0R8SFA424eSRDnsxsTV"
-ACCESS_TOKEN = "1755821570142920704-fnqkmgXWz78khLbxH3fIjY9h4Iipyn"
-ACCESS_TOKEN_SECRET = "I9YbMYwdiaviOQqdwMdnbVViJjx9GRsF8xRj48K8IqDAQ"
+# Set up your cr
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
