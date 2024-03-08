@@ -1,2 +1,7 @@
-googletrans==4.0.0-rc1
+fastapi
 scikit-learn
+uvicorn
+numpy
+streamlit
+googletrans==4.0.0-rc1
+flask
