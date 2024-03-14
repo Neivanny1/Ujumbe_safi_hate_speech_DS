@@ -18,3 +18,20 @@ CREATE TABLE accounts (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );
+
+CREATE TABLE posts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    tweet TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES accounts(id)
+);
+
+CREATE TABLE posts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    tweet TEXT,
+    post_pic VARCHAR(255), -- Assuming the file path or URL of the post picture will be stored
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES accounts(id)
+);

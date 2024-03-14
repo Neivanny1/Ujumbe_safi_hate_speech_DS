@@ -69,13 +69,18 @@
 
       <!-- tweetbox starts -->
       <div class="tweetBox">
-        <form>
+        <form method="POST" action="{{ url_for('create_post') }}" enctype="multipart/form-data">
+
           <div class="tweetbox__input">
-            <img src="{{ url_for('static', filename='uploads/' + account['profile_pic']) }}" alt="Profile Picture">
-            <input type="text" placeholder="What's happening?" />
+              <img src="{{ url_for('static', filename='uploads/' + pic) }}" alt="Profile Picture">
+              <input type="text" name="tweet" placeholder="What's happening?"/>
           </div>
-          <button class="tweetBox__tweetButton">Tweet</button>
-        </form>
+      
+          <input type="file" name="post_pic" accept="image/*" required>
+      
+          <button type="submit" class="tweetBox__tweetButton">Tweet</button>
+      
+      </form>           
       </div>
       <!-- tweetbox ends -->
 

@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash  # Imp
 import MySQLdb.cursors
 from werkzeug.utils import secure_filename
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -34,7 +35,7 @@ def login():
             session['id'] = account['id']
             session['username'] = account['username']
             session['pic'] = account['profile_pic']
-            return render_template('index.html', account=account)  # Pass 'pic' to the template
+            return render_template('index.html', username=session['username'], pic=session['pic'])  # Pass 'pic' to the template
         else:
             msg = 'Incorrect username/password!'
     return render_template('login.html', msg=msg)
@@ -79,8 +80,50 @@ home redirection
 @app.route('/home/')
 def home():
     if 'loggedin' in session:
-        return render_template('inde.html', username=session['username'], pic=session['pic'])
+        return render_template('index.html', username=session['username'], pic=session['pic'])
     return redirect(url_for('login'))
+
+@app.route('/create_post', methods=['POST'])
+def create_post():
+    if request.method == 'POST':
+        if 'loggedin' in session:
+            current_user = session['id']
+            tweet = request.form['tweet']
+            pic = request.files['post_pic']  # Access the file from the request
+            
+            # Validate tweet length
+            if len(tweet) > 280:  # Assuming a maximum tweet length of 280 characters
+                return "Tweet is too long. Please keep it under 280 characters."
+
+            timestamp = datetime.now()
+
+            try:
+                if pic and allowed_file(pic.filename):
+                    filename = secure_filename(pic.filename)
+                    pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    post_pic = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                else:
+                    post_pic = None
+
+                cursor = mysql.connection.cursor()
+
+                # Insert the new post into the 'posts' table
+                cursor.execute("INSERT INTO posts (user_id, tweet, post_pic, timestamp) VALUES (%s, %s, %s, %s)",
+                               (current_user, tweet, post_pic, timestamp))
+
+                # Commit the transaction and close the cursor
+                mysql.connection.commit()
+                cursor.close()
+
+                return redirect(url_for('home'))  # Redirect to the 'home' endpoint
+
+            except Exception as e:
+                # Rollback the transaction in case of error
+                mysql.connection.rollback()
+                return "An error occurred while creating the post: " + str(e)
+
+    return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
