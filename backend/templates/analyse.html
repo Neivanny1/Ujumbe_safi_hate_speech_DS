@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toxicity Detection App</title>
+</head>
+<body>
+    <h1>Toxicity Detection App</h1>
+    <form method="post" action="/">
+        <label for="text_input">Input your text:</label>
+        <input type="text" id="text_input" name="text_input" required>
+        <button type="submit">Analyse</button>
+    </form>
+
+    {% if result %}
+        <h2>Result:</h2>
+        <p>The result is {{ result }}.</p>
+    {% endif %}
+</body>
+</html>
