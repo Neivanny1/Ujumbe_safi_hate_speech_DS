@@ -35,6 +35,7 @@ def login():
             session['id'] = account['id']
             session['username'] = account['username']
             session['pic'] = account['profile_pic']
+            session['fullname'] = account['fullname']
             return render_template('index.html', username=session['username'], pic=session['pic'])  # Pass 'pic' to the template
         else:
             msg = 'Incorrect username/password!'
@@ -72,7 +73,14 @@ def register():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-
+def get_all_tweets():
+    with app.app_context():  # Ensure access to the MySQL connection within the application context
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM posts")
+        posts = cursor.fetchall()
+        cursor.close()
+    
+    return posts
 
 """
 home redirection
@@ -80,8 +88,7 @@ home redirection
 @app.route('/home/')
 def home():
     if 'loggedin' in session:
-        posts = get_all_tweets()
-        return render_template('index.html', posts=posts, username=session['username'], pic=session['pic'])
+        return render_template('index.html', posts=get_all_tweets(), username=session['username'], pic=session['pic'])
     return redirect(url_for('login'))
 
 @app.route('/create_post', methods=['POST'])
@@ -89,6 +96,8 @@ def create_post():
     if request.method == 'POST':
         if 'loggedin' in session:
             current_user = session['id']
+            fullname = session['fullname']
+            username = session['username']
             tweet = request.form['tweet']
             pic = request.files['post_pic']  # Access the file from the request
             
@@ -112,8 +121,8 @@ def create_post():
                 cursor = mysql.connection.cursor()
 
                 # Insert the new post into the 'posts' table
-                cursor.execute("INSERT INTO posts (user_id, tweet, post_pic, profile_pic, timestamp) VALUES (%s, %s, %s, %s, %s)",
-                               (current_user, tweet, post_pic, profile_pic, timestamp))
+                cursor.execute("INSERT INTO posts (user_id, fullname, username, tweet, post_pic, profile_pic, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                               (current_user, fullname, username, tweet, post_pic, profile_pic, timestamp))
 
                 # Commit the transaction and close the cursor
                 mysql.connection.commit()
@@ -127,13 +136,6 @@ def create_post():
                 return "An error occurred while creating the post: " + str(e)
 
     return redirect(url_for('login'))
-
-def get_all_tweets():
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM posts")
-    posts = cursor.fetchall()
-    cursor.close()
-    return posts
 
 if __name__ == '__main__':
     app.run(debug=True)
