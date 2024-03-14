@@ -31,7 +31,8 @@ CREATE TABLE posts (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     tweet TEXT,
-    post_pic VARCHAR(255), -- Assuming the file path or URL of the post picture will be stored
+    post_pic VARCHAR(255),
+    profile_pic VARCHAR(255),-- Assuming the file path or URL of the post picture will be stored
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES accounts(id)
 );

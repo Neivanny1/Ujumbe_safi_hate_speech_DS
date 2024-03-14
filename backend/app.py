@@ -80,7 +80,8 @@ home redirection
 @app.route('/home/')
 def home():
     if 'loggedin' in session:
-        return render_template('index.html', username=session['username'], pic=session['pic'])
+        posts = get_all_tweets()
+        return render_template('index.html', posts=posts, username=session['username'], pic=session['pic'])
     return redirect(url_for('login'))
 
 @app.route('/create_post', methods=['POST'])
@@ -98,18 +99,21 @@ def create_post():
             timestamp = datetime.now()
 
             try:
+                # Retrieve profile pic from session
+                profile_pic = session.get('pic', '')
+
                 if pic and allowed_file(pic.filename):
                     filename = secure_filename(pic.filename)
-                    pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     post_pic = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    pic.save(post_pic)  # Save the post picture to the upload folder
                 else:
                     post_pic = None
 
                 cursor = mysql.connection.cursor()
 
                 # Insert the new post into the 'posts' table
-                cursor.execute("INSERT INTO posts (user_id, tweet, post_pic, timestamp) VALUES (%s, %s, %s, %s)",
-                               (current_user, tweet, post_pic, timestamp))
+                cursor.execute("INSERT INTO posts (user_id, tweet, post_pic, profile_pic, timestamp) VALUES (%s, %s, %s, %s, %s)",
+                               (current_user, tweet, post_pic, profile_pic, timestamp))
 
                 # Commit the transaction and close the cursor
                 mysql.connection.commit()
@@ -124,6 +128,12 @@ def create_post():
 
     return redirect(url_for('login'))
 
+def get_all_tweets():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM posts")
+    posts = cursor.fetchall()
+    cursor.close()
+    return posts
 
 if __name__ == '__main__':
     app.run(debug=True)
