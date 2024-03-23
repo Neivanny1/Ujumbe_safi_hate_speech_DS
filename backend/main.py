@@ -31,9 +31,9 @@ def index():
         input_text = request.form['text_input']
         if input_text:
             result = toxicity_prediction(input_text)
-            return render_template('index.html', result=result)
+            return render_template('analyse.html', result=result)
 
-    return render_template('index.html', result=None)
+    return render_template('analyse.html', result=None)
 
 if __name__ == '__main__':
     app.run(debug=True)

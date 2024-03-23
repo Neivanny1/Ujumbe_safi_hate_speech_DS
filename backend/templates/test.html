@@ -1,0 +1,33 @@
+<!-- Inside your HTML template -->
+<div class="posts">
+  {% for post in posts %}
+    <!-- post starts -->
+    <div class="post">
+      <div class="post__avatar">
+        <img src="{{ url_for('static', filename='uploads/' + post['profile_pic']) }}" alt="Profile Picture">
+      </div>
+      <div class="post__body">
+        <div class="post__header">
+          <div class="post__headerText">
+            <h3>
+              {{ post['fullname'] }}
+                <span class="post__headerSpecial"><span class="material-icons post__badge"> verified </span>{{ post['username'] }}</span>
+            </h3>
+          </div>
+          <div class="post__headerDescription">
+            <p>{{ post['tweet'] }}</p>
+          </div>
+        </div>
+        {% if post['post_pic'] %}
+        <img src="{{ url_for('static', filename='uploads/' + post['profile_pic']) }}" alt="Profile Picture">
+        {% endif %}
+        <div class="post__footer">
+          <span class="material-icons"> repeat </span>
+          <span class="material-icons"> favorite_border </span>
+          <span class="material-icons"> publish </span>
+        </div>
+      </div>
+    </div>
+    <!-- post ends -->
+  {% endfor %}
+</div>

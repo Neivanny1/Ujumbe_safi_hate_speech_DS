@@ -20,7 +20,7 @@ mysql = MySQL(app)
 def get_all_tweets():
     with app.app_context():  # Ensure access to the MySQL connection within the application context
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT * FROM posts")
+        cursor.execute("SELECT * FROM posts ORDER BY timestamp DESC")
         posts = cursor.fetchall()
         cursor.close()
     
@@ -31,4 +31,6 @@ def get_all_tweets():
 posts = get_all_tweets()
 
 print(posts)
-print('Type: ', type(posts))  # Add this line to check if posts are retrieved
+print('Type: ', type(posts))
+print('./'+ posts[0]['post_pic'])
+# Add this line to check if posts are retrieved

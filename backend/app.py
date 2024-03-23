@@ -72,15 +72,26 @@ def register():
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
+'''
+Getting all posts
+'''
 def get_all_tweets():
     with app.app_context():  # Ensure access to the MySQL connection within the application context
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT * FROM posts")
+        cursor.execute("SELECT * FROM posts ORDER BY timestamp DESC")
         posts = cursor.fetchall()
         cursor.close()
     
     return posts
+    
+@app.route('/posts')
+def posts():
+    posts = get_all_tweets()
+    return render_template('posts.html', posts=posts)
+
+@app.route('/redirect_to_posts')
+def redirect_to_posts():
+    return redirect('/posts')
 
 """
 home redirection
@@ -113,8 +124,8 @@ def create_post():
 
                 if pic and allowed_file(pic.filename):
                     filename = secure_filename(pic.filename)
-                    post_pic = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    pic.save(post_pic)  # Save the post picture to the upload folder
+                    post_pic = filename  # Store only the file name
+                    pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))  # Save the post picture to the upload folder
                 else:
                     post_pic = None
 
@@ -136,6 +147,7 @@ def create_post():
                 return "An error occurred while creating the post: " + str(e)
 
     return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

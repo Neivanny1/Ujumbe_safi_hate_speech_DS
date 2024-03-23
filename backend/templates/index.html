@@ -57,7 +57,7 @@
         <span class="material-icons"> more_horiz </span>
         <h2>More</h2>
       </div>
-      <button class="sidebar__tweet">Tweet</button>
+      <button class="sidebar__tweet" onclick="window.location.href='/redirect_to_posts'">Tweet</button>
     </div>
     <!-- sidebar ends -->
 
@@ -66,96 +66,22 @@
       <div class="feed__header">
         <h2>Home</h2>
       </div>
-
       <!-- tweetbox starts -->
       <div class="tweetBox">
         <form method="POST" action="{{ url_for('create_post') }}" enctype="multipart/form-data">
-
           <div class="tweetbox__input">
-              <img src="{{ url_for('static', filename='uploads/' + pic) }}" alt="Profile Picture">
-              <input type="text" name="tweet" placeholder="What's happening?"/>
-          </div>
-      
-          <input type="file" name="post_pic" accept="image/*" required>
-      
+            <img src="{% if pic %}{{ url_for('static', filename='uploads/' + pic) }}{% else %}{{ url_for('static', filename='images/profile.png') }}{% endif %}" alt="Profile Picture">
+          <input type="text" name="tweet" placeholder="What's happening?"/> 
+          </div>         
+          <input type="file" name="post_pic" accept="image/*" required placeholder="Upload Image">
           <button type="submit" class="tweetBox__tweetButton">Tweet</button>
-      
       </form>           
       </div>
       <!-- tweetbox ends -->
 
       <!-- post starts -->
-<!-- Inside your HTML template -->
-      <!-- post starts -->
-      <div class="post">
-        <div class="post__avatar">
-          <img
-            src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png"
-            alt=""
-          />
-        </div>
-
-        <div class="post__body">
-          <div class="post__header">
-            <div class="post__headerText">
-              <h3>
-                Somanath Goudar
-                <span class="post__headerSpecial"
-                  ><span class="material-icons post__badge"> verified </span>@somanathg</span
-                >
-              </h3>
-            </div>
-            <div class="post__headerDescription">
-              <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
-            </div>
-          </div>
-          <img
-            src="https://www.focus2move.com/wp-content/uploads/2020/01/Tesla-Roadster-2020-1024-03.jpg"
-            alt=""
-          />
-          <div class="post__footer">
-            <span class="material-icons"> repeat </span>
-            <span class="material-icons"> favorite_border </span>
-            <span class="material-icons"> publish </span>
-          </div>
-        </div>
-      </div>
-      <!-- post ends -->
-
-      <!-- post starts -->
-      <div class="post">
-        <div class="post__avatar">
-          <img
-            src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png"
-            alt=""
-          />
-        </div>
-
-        <div class="post__body">
-          <div class="post__header">
-            <div class="post__headerText">
-              <h3>
-                Somanath Goudar
-                <span class="post__headerSpecial"
-                  ><span class="material-icons post__badge"> verified </span>@somanathg</span
-                >
-              </h3>
-            </div>
-            <div class="post__headerDescription">
-              <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
-            </div>
-          </div>
-          <img
-            src="https://www.focus2move.com/wp-content/uploads/2020/01/Tesla-Roadster-2020-1024-03.jpg"
-            alt=""
-          />
-          <div class="post__footer">
-            <span class="material-icons"> repeat </span>
-            <span class="material-icons"> favorite_border </span>
-            <span class="material-icons"> publish </span>
-          </div>
-        </div>
-      </div>
+      {% include 'posts.html' %}
+      <button class="sidebar__tweet" onclick="redirectToPosts()">Tweet</button>
       <!-- post ends -->
     </div>
     <!-- feed ends -->
@@ -189,6 +115,45 @@
         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
       </div>
     </div>
+    <script>
+      function redirectToPosts() {
+          fetch('/redirect_to_posts')
+              .then(response => response.json())
+              .then(data => {
+                  // Clear existing posts
+                  document.querySelector('.posts').innerHTML = '';
+  
+                  // Append new posts to the .posts element
+                  data.posts.forEach(post => {
+                      const postElement = document.createElement('div');
+                      postElement.className = 'post';
+                      postElement.innerHTML = `
+                          <div class="post__avatar">
+                              <img src="/static/uploads/${post.profile_pic}" alt="Profile Picture">
+                          </div>
+                          <div class="post__body">
+                              <div class="post__header">
+                                  <div class="post__headerText">
+                                      <h3>${post.fullname}</h3>
+                                  </div>
+                                  <div class="post__headerDescription">
+                                      <p>${post.tweet}</p>
+                                  </div>
+                              </div>
+                              ${post.post_pic ? `<img src="/static/uploads/${post.post_pic}" alt="Post Picture">` : ''}
+                              <div class="post__footer">
+                                  <span class="material-icons"> repeat </span>
+                                  <span class="material-icons"> favorite_border </span>
+                                  <span class="material-icons"> publish </span>
+                              </div>
+                          </div>
+                      `;
+                      document.querySelector('.posts').appendChild(postElement);
+                  });
+              })
+              .catch(error => console.error('Error:', error));
+      }
+  </script>
     <!-- widgets ends -->
   </body>
 </html>
