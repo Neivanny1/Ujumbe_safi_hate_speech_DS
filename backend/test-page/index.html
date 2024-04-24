@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toxicity Detector</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="gradient-text">_UJUMBE SAFI_ Toxicity Detector</h1>
+      <p class="glow">Welcome To Ujumbe Safi Kindly Enter Your Tweet for Analysis</p>
+    </header>
+    
+    <main>
+      <section class="input-section">
+        <textarea id="user-input" placeholder="Enter text here..."></textarea>
+        <button id="detect-button">Check Toxicity</button>
+        <div id="popup" class="hidden">
+          
+        </div>
+      </section>
+
+      <section class="results-section">
+        <div id="result-tab"></div>
+        <div class="graph-container">
+          <canvas id="myChart"></canvas>
+        </div>
+        <div class="metrics">
+          <p>Accuracy: <span id="accuracy">- %</span></p>
+          <p>Precision: <span id="precision">- %</span></p>
+          <p>Error: <span id="error">- %</span></p>
+          <p>F1 Score: <span id="f1-score">-</span></p>
+        </div>
+      </section>
+    </main>
+    <p class="blinking-text" font-size="80" font-style="Calibri"><b>Working in the background may take some seconds. Patience kidogo tu.👌</b></p>
+
+    <footer>
+      <p>&copy; ApexGroup 2024</p>
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
