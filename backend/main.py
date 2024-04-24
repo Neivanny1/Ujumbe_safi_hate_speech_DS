@@ -12,6 +12,7 @@ def load_model():
     nb_model = pickle.load(open("toxicity_model.pkt", "rb"))
     return nb_model
 
+
 def toxicity_prediction(text):
     tfidf = load_tfidf()
     text_tfidf = tfidf.transform([text]).toarray()
@@ -30,10 +31,11 @@ def index():
     if request.method == 'POST':
         input_text = request.form['text_input']
         if input_text:
-            result = toxicity_prediction(input_text)
-            return render_template('analyse.html', result=result)
+            res = swahili_to_english(input_text)
+            result = toxicity_prediction(res)
+            return render_template('testpage.html', result=result)
 
-    return render_template('analyse.html', result=None)
+    return render_template('testpage.html', result=None)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=5001, debug=True)

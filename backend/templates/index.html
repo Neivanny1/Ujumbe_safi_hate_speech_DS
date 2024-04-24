@@ -13,6 +13,13 @@
       integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
       crossorigin="anonymous"
     />
+    <script>
+              setTimeout(function() {
+            document.querySelectorAll('.popup').forEach(function(popup) {
+                popup.style.display = 'none';
+            });
+        }, 10000);
+  </script>
   </head>
   <body>
     <!-- sidebar starts -->
@@ -68,8 +75,19 @@
       </div>
       <!-- tweetbox starts -->
       <div class="tweetBox">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="popup {{ 'success' if message.startswith('Tweet posted successfully') else 'error' }}">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
         <form method="POST" action="{{ url_for('create_post') }}" enctype="multipart/form-data">
-          <div class="tweetbox__input">
+          <h2>Post tweets</h2>
+          <div class="tweetbox__input">  
             <img src="{% if pic %}{{ url_for('static', filename='uploads/' + pic) }}{% else %}{{ url_for('static', filename='images/profile.png') }}{% endif %}" alt="Profile Picture">
           <input type="text" name="tweet" placeholder="What's happening?"/> 
           </div>         
@@ -81,7 +99,7 @@
 
       <!-- post starts -->
       {% include 'posts.html' %}
-      <button class="sidebar__tweet" onclick="redirectToPosts()">Tweet</button>
+      <!-- <button class="sidebar__tweet" onclick="redirectToPosts()">Tweet</button> -->
       <!-- post ends -->
     </div>
     <!-- feed ends -->

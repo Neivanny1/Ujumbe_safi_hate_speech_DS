@@ -238,3 +238,20 @@ body {
   font-size: 18px;
   font-weight: 800;
 }
+.popup.success {
+  background-color: #4CAF50;
+}
+.popup.error {
+  background-color: #f44336;
+}
+.popup .closebtn {
+  color: white;
+  float: right;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.popup .closebtn:hover {
+  color: black;
+}

@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+import pickle
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
-from werkzeug.security import generate_password_hash, check_password_hash  # Import password hashing functions
+from werkzeug.security import generate_password_hash, check_password_hash
 import MySQLdb.cursors
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
+from googletrans import Translator
+import re
 
 app = Flask(__name__)
 
@@ -54,6 +57,24 @@ def register():
         password = request.form['password']
         email = request.form['email']
         profile_pic = request.files['profile_pic']  # Get the uploaded file
+        
+        # Validate email format
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            msg = 'Invalid email address. Please enter a valid email.'
+            return render_template('register.html', msg=msg)
+        
+        # Validate password length
+        if len(password) < 6:
+            msg = 'Password must be at least 6 characters long.'
+            return render_template('register.html', msg=msg)
+        
+        # Validate password complexity (e.g., at least one uppercase, one lowercase, one digit)
+        if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$", password):
+            msg = 'Password must contain at least one lowercase letter, one uppercase letter, and one digit.'
+            return render_template('register.html', msg=msg)
+        
+        # Further validation logic for username, email uniqueness, etc.
+        
         if profile_pic and allowed_file(profile_pic.filename):
             filename = secure_filename(profile_pic.filename)
             profile_pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))  # Save the file to the server
@@ -76,7 +97,7 @@ def allowed_file(filename):
 Getting all posts
 '''
 def get_all_tweets():
-    with app.app_context():  # Ensure access to the MySQL connection within the application context
+    with app.app_context():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM posts ORDER BY timestamp DESC")
         posts = cursor.fetchall()
@@ -102,6 +123,27 @@ def home():
         return render_template('index.html', posts=get_all_tweets(), username=session['username'], pic=session['pic'])
     return redirect(url_for('login'))
 
+
+def load_tfidf():
+    tfidf = pickle.load(open("tf_idf.pkt", "rb"))
+    return tfidf
+
+def load_model():
+    nb_model = pickle.load(open("toxicity_model.pkt", "rb"))
+    return nb_model
+def toxicity_prediction(text):
+    tfidf = load_tfidf()
+    text_tfidf = tfidf.transform([text]).toarray()
+    nb_model = load_model()
+    prediction = nb_model.predict(text_tfidf)
+    class_name = "Toxic" if prediction == 1 else "Non-Toxic"
+    return class_name
+
+def swahili_to_english(tweet):
+    translator = Translator()
+    translation = translator.translate(tweet, dest='en')
+    return translation.text
+
 @app.route('/create_post', methods=['POST'])
 def create_post():
     if request.method == 'POST':
@@ -110,11 +152,16 @@ def create_post():
             fullname = session['fullname']
             username = session['username']
             tweet = request.form['tweet']
-            pic = request.files['post_pic']  # Access the file from the request
-            
+            pic = request.files['post_pic']
             # Validate tweet length
-            if len(tweet) > 280:  # Assuming a maximum tweet length of 280 characters
-                return "Tweet is too long. Please keep it under 280 characters."
+            if len(tweet) > 280:
+                flash("Tweet is too long. Please keep it under 280 characters.")
+                return redirect(url_for('home'))
+            res = swahili_to_english(tweet)
+            toxicity = toxicity_prediction(res)
+            if toxicity == "Toxic":
+                flash("Error: Tweet contains toxic content. You cannot post toxic tweets.")
+                return redirect(url_for('home'))
 
             timestamp = datetime.now()
 
@@ -124,8 +171,10 @@ def create_post():
 
                 if pic and allowed_file(pic.filename):
                     filename = secure_filename(pic.filename)
-                    post_pic = filename  # Store only the file name
-                    pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))  # Save the post picture to the upload folder
+                    # Store only the file name
+                    post_pic = filename
+                    # Save the post picture to the upload folder
+                    pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 else:
                     post_pic = None
 
@@ -139,15 +188,19 @@ def create_post():
                 mysql.connection.commit()
                 cursor.close()
 
+                flash("Tweet posted successfully!")
                 return redirect(url_for('home'))  # Redirect to the 'home' endpoint
 
             except Exception as e:
                 # Rollback the transaction in case of error
                 mysql.connection.rollback()
-                return "An error occurred while creating the post: " + str(e)
+                flash("An error occurred while creating the post: " + str(e))
+                return redirect(url_for('home'))
 
     return redirect(url_for('login'))
-
+@app.route('/manual')
+def manual_test():
+    return render_template('testpage.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=5000, debug=True)
