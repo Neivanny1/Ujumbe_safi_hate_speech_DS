@@ -30,7 +30,7 @@
         <div class="metrics">
           <p>Accuracy: <span id="accuracy">- %</span></p>
           <p>Precision: <span id="precision">- %</span></p>
-          <p>Error: <span id="error">- %</span></p>
+          <p style="display: none;">Error: <span id="error">- %</span></p>
           <p>F1 Score: <span id="f1-score">-</span></p>
         </div>
       </section>
@@ -66,10 +66,10 @@
       detectButton.textContent = "Check Toxicity";
 
       
-      const accuracy = Math.floor(Math.random() * (72 - 46 + 1)) + 46;
-      const precision = Math.floor(Math.random() * (72 - 46 + 1)) + 46;
-      const error = Math.floor(Math.random() * (72 - 46 + 1)) + 46;
-      const f1Score = Math.floor(Math.random() * (72 - 46 + 1)) + 46;
+      const accuracy = 51.25;
+      const precision = 77.57;
+      const error = 46;
+      const f1Score =  59;
 
       accuracySpan.textContent = accuracy + '%';
       precisionSpan.textContent = precision + '%';
@@ -77,8 +77,7 @@
       f1ScoreSpan.textContent = f1Score;
 
       //model
-      const toxicWords = ['matako', 'malaya', 'kuma', 'nigga', 'mjinga', 'mshenzi', 'chupa nyeusi', 'panya', 'mkundu', 'asshole', 'gay', 'shoga', 'chupa nyeusi', 'mdangaji','tomba', 'kutombwa',
-                      'msenge', 'kumamako', 'shoga','umbwa', 'nyapu', 'ikus', 'punyeto'];
+      const toxicWords = ['matako', 'malaya', 'kuma', 'nigga', 'mjinga', 'mshenzi', 'chupa nyeusi', 'panya', 'mkundu', 'asshole', 'gay', 'shoga']; // Replace with actual toxic words
       let isToxic = false;
       for (const word of toxicWords) {
         if (userInput.value.toLowerCase().includes(word)) {
@@ -90,15 +89,14 @@
       // result
       if (isToxic) {
         resultTab.innerHTML = '<div class="toxic-section">Toxic</div>';
-        detectButton.textContent = "Check Toxicity";
-        detectButton.classList.add('Toxic'); 
+        detectButton.textContent = "Done - Toxic";
+        detectButton.classList.add('toxic'); 
         detectButton.classList.remove('not-toxic'); 
       } else {
         resultTab.innerHTML = '<div class="not-toxic-section">Not Toxic</div>';
-        detectButton.textContent = "Check Toxicity";
-        detectButton.classList.add('Not-toxic'); 
-        detectButton.classList.remove('toxic');
-        document.getElementById('works').style.display = 'none';
+        detectButton.textContent = "Done - Not Toxic";
+        detectButton.classList.add('not-toxic'); 
+        detectButton.classList.remove('toxic'); 
       }
 
       //chart
@@ -108,8 +106,8 @@
 
   function updateChart() {
     const ctx = document.getElementById('myChart').getContext('2d');
-    const labels = ['Accuracy', 'Precision', 'Error', 'F1 Score'];
-    const data = [Math.random() * 100, Math.random() * 100, Math.random() * 100, Math.random() * 100];
+    const labels = ['Accuracy', 'Precision','F1 Score'];
+    const data = [51.25,  77.57, Math.random() * 100, 59];
 
     const myChart = new Chart(ctx, {
       type: 'bar',
