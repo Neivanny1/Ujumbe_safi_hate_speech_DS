@@ -18,7 +18,7 @@
             document.querySelectorAll('.popup').forEach(function(popup) {
                 popup.style.display = 'none';
             });
-        }, 10000);
+        }, 120000);
   </script>
   </head>
   <body>
@@ -91,7 +91,7 @@
             <img src="{% if pic %}{{ url_for('static', filename='uploads/' + pic) }}{% else %}{{ url_for('static', filename='images/profile.png') }}{% endif %}" alt="Profile Picture">
           <input type="text" name="tweet" placeholder="What's happening?"/> 
           </div>         
-          <input type="file" name="post_pic" accept="image/*" required placeholder="Upload Image">
+          <input type="file" name="post_pic" accept="image/*" placeholder="Upload Image">
           <button type="submit" class="tweetBox__tweetButton">Tweet</button>
       </form>           
       </div>
